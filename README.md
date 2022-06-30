@@ -1,0 +1,1 @@
+# generator-nop-commerce-plugin
