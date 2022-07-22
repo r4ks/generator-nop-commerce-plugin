@@ -21,6 +21,10 @@
   },
   "homepage": "https://github.com/r4ks/generator-nop-commerce-plugin#readme",
   "dependencies": {
+    "ejs": "^3.1.8",
+    "loadash": "^1.0.0",
+    "pluralize": "^8.0.0",
+    "yeoman-environment": "^3.9.1",
     "yeoman-generator": "^5.6.1"
   },
   "files": [
