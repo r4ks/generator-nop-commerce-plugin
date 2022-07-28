@@ -3,6 +3,11 @@ var yeoman = require('yeoman-environment');
 var env = yeoman.createEnv();
 var beautify = require("gulp-beautify");
 
+// answer props:
+const NAME = "name";
+
+const USERNAME = "username";
+const MENUSONPLUGINSNODE = "menusOnPluginsNode";
 module.exports = class extends Generator {
     constructor(args, opts) {
         super(args, opts);
@@ -49,19 +54,19 @@ module.exports = class extends Generator {
          this.answers = await this.prompt([
             {
                 type: "input",
-                name: "username",
+                name: USERNAME,
                 message: "What is your GitHub username?",
                 store: true
             },
             {
                 type: "input",
-                name: "name",
+                name: NAME,
                 message: "Your Plugin Name",
                 default: this.appname
             },
             {
                 type: "confirm",
-                name: "menusOnPluginsNode",
+                name: MENUSONPLUGINSNODE,
                 message: "Do you wish to put the menu items inside the standard Plugins Menu Category?",
                 default: false
             }
@@ -70,13 +75,13 @@ module.exports = class extends Generator {
     }
 
     writing() {
-        this.log("app name", this.answers.name);
-        this.log("menus inside plugins category", this.answers.menusOnPluginsNode);
+        this.log("app name", this.answers[NAME]);
+        this.log("menus inside plugins category", this.answers[MENUSONPLUGINSNODE]);
 
         this.fs.copyTpl(
             this.templatePath("index.html"),
             this.destinationPath("public/index.html"),
-            { title: this.answers.name }
+            { title: this.answers[NAME] }
         );
     }
 };
