@@ -4,6 +4,7 @@ import CSharpLexer from './CSharpLexer.js';
 import CSharpParser from './CSharpParser.js';
 import CSharpParserListener from './CSharpParserListener.js';
 import CSharpParserVisitor from './CSharpParserVisitor.js';
+import * as fs from 'fs';
 
 const input = `
 class Multiple
@@ -13,12 +14,23 @@ class Multiple
 		var a = 3, b = 2;
 	}
 }`;
-const chars = new antlr4.InputStream(input);
+
+var path = "source/Nop.Plugin.Widgets.HumanResource/Web/Infrastructure/PluginNopStartup.cs";
+
+var text = "";
+try {
+    text = fs.readFileSync(path, "utf-8");
+    // console.log(text.toString());
+} catch(e) {
+    console.log(e);
+}
+
+const chars = new antlr4.InputStream(text);
 const lexer = new CSharpLexer(chars);
 const tokens = new antlr4.CommonTokenStream(lexer);
 const parser = new CSharpParser(tokens);
 parser.buildParseTrees = true;
-var tree = parser.class_definition();
+var tree = parser.method_declaration();
 
 class Visitor  extends CSharpParserVisitor {
     visitClass_definition(ctx) {
