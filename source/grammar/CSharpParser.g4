@@ -4,7 +4,7 @@
 
 parser grammar CSharpParser;
 
-options { tokenVocab=CSharpLexer; superClass = CSharpParserBase; }
+options { tokenVocab = CSharpLexer; }
 
 // entry point
 compilation_unit
@@ -159,7 +159,7 @@ multiplicative_expression
 	;
 
 switch_expression
-    : range_expression ('switch' '{' (switch_expression_arms ','?)? '}')?
+    : range_expression ('switch' OPEN_BRACE (switch_expression_arms ','?)? CLOSE_BRACE )?
     ;
 
 switch_expression_arms
@@ -310,7 +310,7 @@ isType
 	;
 
 isTypePatternArms
-	: '{' isTypePatternArm (',' isTypePatternArm)* '}'
+	: OPEN_BRACE isTypePatternArm (',' isTypePatternArm)* CLOSE_BRACE
 	;
 
 isTypePatternArm
@@ -473,7 +473,7 @@ block
 	;
 
 local_variable_declaration
-	: (USING | REF | REF READONLY)? local_variable_type local_variable_declarator ( ','  local_variable_declarator { this.IsLocalVariableDeclaration() }? )*
+	: (USING | REF | REF READONLY)? local_variable_type local_variable_declarator ( ','  local_variable_declarator )*
 	| FIXED pointer_type fixed_pointer_declarators
 	;
 

@@ -6,8 +6,6 @@ lexer grammar CSharpLexer;
 
 channels { COMMENTS_CHANNEL, DIRECTIVE }
 
-options { superClass = CSharpLexerBase; }
-
 BYTE_ORDER_MARK: '\u00EF\u00BB\u00BF';
 
 SINGLE_LINE_DOC_COMMENT: '///' InputCharacter*    -> channel(COMMENTS_CHANNEL);
@@ -140,19 +138,19 @@ REAL_LITERAL:        ([0-9] ('_'* [0-9])*)? '.' [0-9] ('_'* [0-9])* ExponentPart
 CHARACTER_LITERAL:                   '\'' (~['\\\r\n\u0085\u2028\u2029] | CommonCharacter) '\'';
 REGULAR_STRING:                      '"'  (~["\\\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
 VERBATIUM_STRING:                    '@"' (~'"' | '""')* '"';
-INTERPOLATED_REGULAR_STRING_START:   '$"' { this.OnInterpolatedRegularStringStart(); } -> pushMode(INTERPOLATION_STRING);
-INTERPOLATED_VERBATIUM_STRING_START: '$@"'  { this.OnInterpolatedVerbatiumStringStart(); }  -> pushMode(INTERPOLATION_STRING);
+INTERPOLATED_REGULAR_STRING_START:   '$"' -> pushMode(INTERPOLATION_STRING);
+INTERPOLATED_VERBATIUM_STRING_START: '$@"' -> pushMode(INTERPOLATION_STRING);
 
 //B.1.9 Operators And Punctuators
-OPEN_BRACE:               '{' { this.OnOpenBrace(); };
-CLOSE_BRACE:              '}' { this.OnCloseBrace(); };
+OPEN_BRACE:               '{';
+CLOSE_BRACE:              '}';
 OPEN_BRACKET:             '[';
 CLOSE_BRACKET:            ']';
 OPEN_PARENS:              '(';
 CLOSE_PARENS:             ')';
 DOT:                      '.';
 COMMA:                    ',';
-COLON:                    ':' { this.OnColon(); };
+COLON:                    ':';
 SEMICOLON:                ';';
 PLUS:                     '+';
 MINUS:                    '-';
@@ -196,17 +194,17 @@ OP_RANGE:                 '..';
 mode INTERPOLATION_STRING;
 
 DOUBLE_CURLY_INSIDE:           '{{';
-OPEN_BRACE_INSIDE:             '{' { this.OpenBraceInside(); } -> skip, pushMode(DEFAULT_MODE);
-REGULAR_CHAR_INSIDE:           { this.IsRegularCharInside() }? SimpleEscapeSequence;
-VERBATIUM_DOUBLE_QUOTE_INSIDE: { this.IsVerbatiumDoubleQuoteInside() }? '""';
-DOUBLE_QUOTE_INSIDE:           '"' { this.OnDoubleQuoteInside(); } -> popMode;
-REGULAR_STRING_INSIDE:         { this.IsRegularCharInside() }? ~('{' | '\\' | '"')+;
-VERBATIUM_INSIDE_STRING:       { this.IsVerbatiumDoubleQuoteInside() }? ~('{' | '"')+;
+OPEN_BRACE_INSIDE:             '{' -> skip, pushMode(DEFAULT_MODE);
+REGULAR_CHAR_INSIDE:           SimpleEscapeSequence;
+VERBATIUM_DOUBLE_QUOTE_INSIDE: '""';
+DOUBLE_QUOTE_INSIDE:           '"' -> popMode;
+REGULAR_STRING_INSIDE:         ~('{' | '\\' | '"')+;
+VERBATIUM_INSIDE_STRING:       ~('{' | '"')+;
 
 mode INTERPOLATION_FORMAT;
 
 DOUBLE_CURLY_CLOSE_INSIDE:      '}}' -> type(FORMAT_STRING);
-CLOSE_BRACE_INSIDE:             '}' { this.OnCloseBraceInside(); }   -> skip, popMode;
+CLOSE_BRACE_INSIDE:             '}'  -> skip, popMode;
 FORMAT_STRING:                  ~'}'+;
 
 mode DIRECTIVE_MODE;
