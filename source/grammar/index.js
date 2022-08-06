@@ -19,7 +19,7 @@ var path = "source/Nop.Plugin.Widgets.HumanResource/Web/Infrastructure/PluginNop
 
 var text = "";
 try {
-    text = fs.readFileSync(path, "utf-8");
+    text = fs.readFileSync(path, "utf-8").toString();
     // console.log(text.toString());
 } catch(e) {
     console.log(e);
@@ -33,7 +33,7 @@ parser.buildParseTrees = true;
 // var tree = parser.method_declaration();
 
 // class Visitor  extends CSharpParserVisitor {
-//     visitClass_definition(ctx) {
+//     visitMethod_declaration(ctx) {
 //         // super.visitClass_definition(ctx);
 
 //         if (!ctx) {
@@ -42,13 +42,12 @@ parser.buildParseTrees = true;
 
 //         if (ctx.children) {
 //         var childrens = ctx.children.map(child => {
-//             // if (child.children && child.children.length != 0) {
-//             //   return child.accept(this);
-//             // } else {
+//             if (child.children && child.children.length != 0) {
+//               return child.accept(this);
+//             } else {
 //             return child.getText();
-//             // }
+//             }
 //         });
-//         console.log(childrens);
 //         return childrens;
 //         }
 
@@ -75,7 +74,10 @@ class KeyPrinter extends MyGrammarListener {
         console.log("Oh, a key!");
     }
 }
-
-var tree = parser.using_directives(); // assumes grammar "MyGrammar" has rule "MyStartRule"
+var tree = parser.namespace_member_declarations();
+// var tree = parser.using_directives(); // assumes grammar "MyGrammar" has rule "MyStartRule"
 const printer = new KeyPrinter();
 antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
+
+// print the code as it was without pretty printting.
+console.log(antlr4.tree.Trees.toStringTree(tree, tree.parser.ruleNames));
