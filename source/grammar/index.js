@@ -57,27 +57,37 @@ parser.buildParseTrees = true;
 // tree.accept(new Visitor());
 
 
-class MyGrammarListener extends CSharpParserListener {
-    constructor() {
-        super();
+class KeyPrinter extends CSharpParserListener {
+
+    // override default listener behavior
+    enterMethod_body(ctx) {
+        console.log("enter method body start at:", ctx.start.line);
+        // don't know what is for this two:
+        // console.log("enter method body at:", ctx.getAltNumber());
+        // console.log("enter method body at:", ctx.depth());
+        console.log("enter method body for:", ctx.getText());
     }
-   
-    enterKey(ctx) {}
-    exitKey(ctx) {}
-    enterValue(ctx) {}
-    exitValue(ctx) {}
+
+    enterMethod_declaration(ctx) {
+        console.log("exit method declaration at:", ctx.start.line);
+        console.log("exit method declaration at:", ctx.getText());
+    }
+
+    exitMethod_declaration(ctx) {
+        console.log("exit method declaration at:", ctx.start.line);
+        console.log("exit method declaration at:", ctx.getText());
+    }
+
+    enterMethod_member_name(ctx) {
+        console.log("enter method member name at:", ctx.start.line);
+        console.log("enter method member name for:", ctx.getText());
+    }
 }
 
-class KeyPrinter extends MyGrammarListener {
-    // override default listener behavior
-    exitKey(ctx) {
-        console.log("Oh, a key!");
-    }
-}
-var tree = parser.namespace_member_declarations();
+var tree = parser.compilation_unit();
 // var tree = parser.using_directives(); // assumes grammar "MyGrammar" has rule "MyStartRule"
 const printer = new KeyPrinter();
 antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 
 // print the code as it was without pretty printting.
-console.log(antlr4.tree.Trees.toStringTree(tree, tree.parser.ruleNames));
+// console.log(antlr4.tree.Trees.toStringTree(tree, tree.parser.ruleNames));
