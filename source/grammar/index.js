@@ -59,6 +59,22 @@ parser.buildParseTrees = true;
 
 class KeyPrinter extends CSharpParserListener {
 
+	enterNamespace_declaration(ctx) {
+        console.log("enter namespace declaration at:", ctx.start.line);
+        console.log("enter namespace declaration for:", ctx.getText());
+	}
+
+
+	enterUsingNamespaceDirective(ctx) {
+        console.log("enter using statement at:", ctx.start.line);
+        console.log("enter using statement for:", ctx.getText());
+	}
+
+	exitUsingNamespaceDirective(ctx) {
+        console.log("exit using statement at:", ctx.start.line);
+        console.log("exit using statement for:", ctx.getText());
+	}
+
     // override default listener behavior
     enterMethod_body(ctx) {
         console.log("enter method body start at:", ctx.start.line);
