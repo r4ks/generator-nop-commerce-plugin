@@ -28,6 +28,18 @@ try {
 const chars = new antlr4.InputStream(text);
 const lexer = new CSharpLexer(chars);
 const tokens = new antlr4.CommonTokenStream(lexer);
+// const comments = new antlr4.CommonTokenStream(lexer, CSharpLexer.COMMENTS_CHANNEL);
+// const spaces = new antlr4.CommonTokenStream(lexer, CSharpLexer.HIDDEN);
+// const sp = new CSharpParser(comments);
+// const cp = new CSharpParser(spaces);
+// var st = sp.compilation_unit();
+// var ct = cp.compilation_unit();
+// console.log(
+//     "$==================================================================",
+//     antlr4.tree.Trees.toStringTree(st, st.parser.ruleNames),
+//     "$==================================================================",
+//     );
+
 const parser = new CSharpParser(tokens);
 parser.buildParseTrees = true;
 // var tree = parser.method_declaration();
@@ -106,4 +118,4 @@ const printer = new KeyPrinter();
 antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 
 // print the code as it was without pretty printting.
-// console.log(antlr4.tree.Trees.toStringTree(tree, tree.parser.ruleNames));
+console.log(antlr4.tree.Trees.toStringTree(tree, tree.parser.ruleNames));
