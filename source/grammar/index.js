@@ -4,6 +4,8 @@ import CSharpLexer from './CSharpLexer.js';
 import CSharpParser from './CSharpParser.js';
 import CSharpParserListener from './CSharpParserListener.js';
 import CSharpParserVisitor from './CSharpParserVisitor.js';
+// import BufferedTokenStream from "antlr4/BufferedTokenStream";
+// import { Token } from 'antlr4/Token';
 import * as fs from 'fs';
 
 const input = `
@@ -39,8 +41,10 @@ const tokens = new antlr4.CommonTokenStream(lexer);
 //     antlr4.tree.Trees.toStringTree(st, st.parser.ruleNames),
 //     "$==================================================================",
 //     );
-
+// const rewriter = new TokenStreamRewriter(commonTokenStream);
 const parser = new CSharpParser(tokens);
+// const ctree = parser.chunk();
+
 parser.buildParseTrees = true;
 // var tree = parser.method_declaration();
 
@@ -70,6 +74,14 @@ parser.buildParseTrees = true;
 
 
 class KeyPrinter extends CSharpParserListener {
+    // _tokens: BufferedTokenStream;
+    // semi: Token[];
+
+    constructor(tokens){
+        super(tokens);
+        this._tokens = tokens;
+        // console.log(tokens);
+    }
 
 	enterNamespace_declaration(ctx) {
         console.log("enter namespace declaration at:", ctx.start.line);
@@ -110,12 +122,48 @@ class KeyPrinter extends CSharpParserListener {
         console.log("enter method member name at:", ctx.start.line);
         console.log("enter method member name for:", ctx.getText());
     }
+
+	// Enter a parse tree produced by CSharpParser#class_body.
+	enterClass_body(ctx) {
+	}
+
+	// Exit a parse tree produced by CSharpParser#class_body.
+	exitClass_body(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CSharpParser#class_member_declarations.
+	enterClass_member_declarations(ctx) {
+	}
+
+	// Exit a parse tree produced by CSharpParser#class_member_declarations.
+	exitClass_member_declarations(ctx) {
+	}
+
+	// Enter a parse tree produced by CSharpParser#class_definition.
+	enterClass_definition(ctx) {
+        // var cmtChannel  = this._tokens.getHiddenTokensToRight(ctx.tokenIndex, CSharpLexer.COMMENTS_CHANNEL);
+        // var cmtChannel  = this._tokens.previousTokenOnChannel(ctx.tokenIndex, CSharpLexer.HIDDEN);
+        // var cmtChannel  = this._tokens.nextTokenOnChannel(ctx.tokenIndex, CSharpLexer.HIDDEN);
+        // if(cmtChannel != null) {
+        //     let cmt = cmtChannel.get(0);
+        //     let txt = cmt.text;
+        //     console.log("**************************************************************");
+        //     console.log(txt);
+        //     console.log("**************************************************************");
+        // }
+	}
+
+	// Exit a parse tree produced by CSharpParser#class_definition.
+	exitClass_definition(ctx) {
+	}
 }
 
 var tree = parser.compilation_unit();
 // var tree = parser.using_directives(); // assumes grammar "MyGrammar" has rule "MyStartRule"
-const printer = new KeyPrinter();
+const printer = new KeyPrinter(tokens);
 antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 
 // print the code as it was without pretty printting.
-console.log(antlr4.tree.Trees.toStringTree(tree, tree.parser.ruleNames));
+// console.log(antlr4.tree.Trees.toStringTree(tree, tree.parser.ruleNames));
+console.log(tokens.getText()); // re-print source code from CommonTokenStream
