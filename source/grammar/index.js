@@ -7,6 +7,9 @@ import CSharpParserVisitor from './CSharpParserVisitor.js';
 // import BufferedTokenStream from "antlr4/BufferedTokenStream";
 // import { Token } from 'antlr4/Token';
 import * as fs from 'fs';
+import BufferedTokenStream from './BufferedTokenStream.js';
+import TokenStreamRewriter from './TokenStreamRewritter.js';
+import CommonTokenStream from './CommonTokenStream.js';
 
 const input = `
 class Multiple
@@ -29,7 +32,8 @@ try {
 
 const chars = new antlr4.InputStream(text);
 const lexer = new CSharpLexer(chars);
-const tokens = new antlr4.CommonTokenStream(lexer);
+const tokens = new CommonTokenStream(lexer, undefined);
+
 // const comments = new antlr4.CommonTokenStream(lexer, CSharpLexer.COMMENTS_CHANNEL);
 // const spaces = new antlr4.CommonTokenStream(lexer, CSharpLexer.HIDDEN);
 // const sp = new CSharpParser(comments);
@@ -41,11 +45,12 @@ const tokens = new antlr4.CommonTokenStream(lexer);
 //     antlr4.tree.Trees.toStringTree(st, st.parser.ruleNames),
 //     "$==================================================================",
 //     );
-// const rewriter = new TokenStreamRewriter(commonTokenStream);
+const rewriter = new TokenStreamRewriter(tokens);
 const parser = new CSharpParser(tokens);
 // const ctree = parser.chunk();
 
 parser.buildParseTrees = true;
+rewriter.buildParseTrees = true;
 // var tree = parser.method_declaration();
 
 // class Visitor  extends CSharpParserVisitor {
@@ -86,6 +91,7 @@ class KeyPrinter extends CSharpParserListener {
 	enterNamespace_declaration(ctx) {
         console.log("enter namespace declaration at:", ctx.start.line);
         console.log("enter namespace declaration for:", ctx.getText());
+        rewriter.replace(ctx.start.tokenIndex, ctx.stop.tokenIndex, "SOME_REPLACEMENT");
 	}
 
 
@@ -161,9 +167,10 @@ class KeyPrinter extends CSharpParserListener {
 
 var tree = parser.compilation_unit();
 // var tree = parser.using_directives(); // assumes grammar "MyGrammar" has rule "MyStartRule"
-const printer = new KeyPrinter(tokens);
+const printer = new KeyPrinter(rewriter);
 antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 
 // print the code as it was without pretty printting.
 // console.log(antlr4.tree.Trees.toStringTree(tree, tree.parser.ruleNames));
-console.log(tokens.getText()); // re-print source code from CommonTokenStream
+// console.log(tokens.getText()); // re-print source code from CommonTokenStream
+console.log(rewriter.getText()); // re-print source code from CommonTokenStream
