@@ -7,6 +7,7 @@ import CSharpParserVisitor from './CSharpParserVisitor.js';
 // import BufferedTokenStream from "antlr4/BufferedTokenStream";
 // import { Token } from 'antlr4/Token';
 import * as fs from 'fs';
+import * as path from 'path';
 import BufferedTokenStream from './BufferedTokenStream.js';
 import TokenStreamRewriter from './TokenStreamRewritter.js';
 import CommonTokenStream from './CommonTokenStream.js';
@@ -20,11 +21,11 @@ class Multiple
 	}
 }`;
 
-var path = "source/Nop.Plugin.Widgets.HumanResource/Web/Infrastructure/PluginNopStartup.cs";
+var p = "source/Nop.Plugin.Widgets.HumanResource/Web/Infrastructure/PluginNopStartup.cs";
 
 var text = "";
 try {
-    text = fs.readFileSync(path, "utf-8").toString();
+    text = fs.readFileSync(p, "utf-8").toString();
     // console.log(text.toString());
 } catch(e) {
     console.log(e);
@@ -88,10 +89,10 @@ class KeyPrinter extends CSharpParserListener {
         // console.log(tokens);
     }
 
-	enterNamespace_declaration(ctx) {
+	exitNamespace_body(ctx) {
         console.log("enter namespace declaration at:", ctx.start.line);
         console.log("enter namespace declaration for:", ctx.getText());
-        rewriter.replace(ctx.start.tokenIndex, ctx.stop.tokenIndex, "SOME_REPLACEMENT");
+        rewriter.insertAfter(ctx.start.tokenIndex, "\n***NEW=CODE***");
 	}
 
 
@@ -174,3 +175,38 @@ antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 // console.log(antlr4.tree.Trees.toStringTree(tree, tree.parser.ruleNames));
 // console.log(tokens.getText()); // re-print source code from CommonTokenStream
 console.log(rewriter.getText()); // re-print source code from CommonTokenStream
+
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ List all Files ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+const getAllFiles = function(dirPath, arrayOfFiles) {
+  var files = fs.readdirSync(dirPath)
+
+  arrayOfFiles = arrayOfFiles || []
+
+  files.forEach(function(file) {
+    if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+      arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
+    } else {
+      arrayOfFiles.push(path.join(dirPath, "/", file))
+    }
+  })
+
+  return arrayOfFiles
+}
+
+const result = getAllFiles("source/Nop.Plugin.Widgets.HumanResource/", []);
+var projectFiles = result.filter(i => i.includes(".cs"))
+const csprojFiles = projectFiles.filter(i => i.includes(".csproj"))
+projectFiles = projectFiles.filter(i => !i.includes(".csproj"))
+
+const cshtmlFiles = projectFiles.filter(i => i.includes(".cshtml"))
+projectFiles = projectFiles.filter(i => !i.includes(".cshtml"))
+const cssFiles = projectFiles.filter(i => i.includes(".css"))
+projectFiles = projectFiles.filter(i => !i.includes(".css"))
+
+const otherFiles = result.filter(i => !i.includes(".cs"))
+console.log(projectFiles);
+console.log(cssFiles);
+console.log(cshtmlFiles);
+console.log(csprojFiles);
+console.log(otherFiles);
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ end List all Files ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
